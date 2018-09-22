@@ -20,7 +20,7 @@ conda activate geoML
 conda install -c conda-forge googlemaps 
 conda install spyder
 conda install ipykernel=4.8.2  #Tinha um bug na versao do spyder por isso essa instalacao e necessario
-
+conda install matplotlib
 
 HEADER DO distances.csv:
 
