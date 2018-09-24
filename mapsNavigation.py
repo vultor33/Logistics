@@ -84,13 +84,17 @@ Z = [[0., 1.], [1., 2.], [2., 3.], [3., 4.]]
 #result = [crossValidationResults.mean(),crossValidationResults.std()]
 #print(result)
  
+# multivariate input
+X = [[0., 0.], [1., 1.], [2., 2.], [3., 3.]]
+# univariate output
+Y = [0., 1., 2., 3.]
+# DEFINING OPTIONS - par_DATA
+mlOptions = MachineLearningOptions()
+mlOptions.setMLApplication('regression')
+mlOptions.setCrossValidationDataSplit(2)
 
-
-
-algoz = AlgorithmsEvaluation(X,Y)
-algoz.setCrossValidationSplitNumber(2)
-algoz.setScoringMethod('r2')
-algoz.runTestRegression()
+algoz = AlgorithmsEvaluation(X,Y,mlOptions)
+algoz.runDefaultTest()
 
 
 

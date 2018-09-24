@@ -22,48 +22,25 @@ from sklearn.neural_network import MLPRegressor
 
 class AlgorithmsEvaluation:
 
-	def __init__(self, X_train, Y_train):
-        #e necessario implementar o GridSearchCV que e mais preciso
-		self.__SEED = 7
-		self.__SCORING = 'accuracy'
-		self.__DATASETSPLIT = 10 # 10 is the general recommended value (date 09/18) tem o leave one out cross validation q e com tudo, mas deve ser bem mais pesado - fazer com o modelo final
+	def __init__(self, X_train, Y_train, machineLearningOptions_):
+		self.__ML_APP_CLASSIFICATION = 'classification' # transfer this to globals
+		self.__ML_APP_REGRESSION = 'regression'
+		self.__ML_APP_CLUSTERING = 'clustering'
+		self.__ML_APP_ERROR = 'Application not implemented'
+
+		self.__applicationType = machineLearningOptions_.getMLApplication()
+		self.__SEED = machineLearningOptions_.getSeed()
+		self.__SCORING = machineLearningOptions_.getScoringMethod()
+		self.__DATASETSPLIT = machineLearningOptions_.getCrossValidationDataSplit()
 		self.__X_train = X_train
 		self.__Y_train = Y_train
 
-	def setCrossValidationSplitNumber(self, value):
-		self.__DATASETSPLIT = value
-		
-	def setScoringMethod(self, value):
-		self.__SCORING = value
-
-	def runTest(self):
-		models = self._defaultModels()
-		bestModel = models[0]
-		bestModelFit = -1
-		for name, model in models:
-			modelType = [name, model]
-			numberResult = self.evaluateMethod(model)
-			self._printResults(modelType + numberResult)
-			if(numberResult[0] > bestModelFit):
-				bestModel = modelType
-				bestModelFit = numberResult[0]
-		return bestModel
-
-	def runTestRegression(self):
-		self.__evaluationResults = open('AlgorithmEvaluation.txt','w')
-		models = self._defaultRegressionModels()
-		bestModel = models[0]
-		bestModelFit = -1
-		for name, model in models:
-			modelType = [name, model]
-			numberResult = self.evaluateMethod(model)
-			self._printResults(modelType + numberResult)
-			if(numberResult[0] > bestModelFit):
-				bestModel = modelType
-				bestModelFit = numberResult[0]
+	def runDefaultTest(self):
+		self.__evaluationResults = open('AlgorithmEvaluation.txt','w')		
+		models = self._getDefaultModels()
+		self._runTest(models)
 		self.__evaluationResults.close()
-		return bestModel
-   
+
 	def evaluateMethod(self, method):
 		crossValidationDivisions = model_selection.KFold(
 				n_splits=self.__DATASETSPLIT, 
@@ -79,7 +56,30 @@ class AlgorithmsEvaluation:
 		result = [crossValidationResults.mean(),crossValidationResults.std()]
 		return result
 
-	def _defaultModels(self):
+	def _runTest(self, models):
+		print(models)
+		bestModel = models[0]
+		bestModelFit = -1
+		for name, model in models:
+			modelType = [name, model]
+			numberResult = self.evaluateMethod(model)
+			self._printResults(modelType + numberResult)
+			if(numberResult[0] > bestModelFit):
+				bestModel = modelType
+				bestModelFit = numberResult[0]
+		return bestModel
+
+	def _getDefaultModels(self):
+		models = []
+		if self.__applicationType == self.__ML_APP_CLASSIFICATION:
+			models = self._defaultClassificationModels()
+		if self.__applicationType == self.__ML_APP_REGRESSION:
+			models = self._defaultRegressionModels()
+		else:
+			raise Exception(self.__ML_APP_ERROR)
+		return models
+
+	def _defaultClassificationModels(self):
 		models = []
 		#clf1 = LogisticRegression()
 		#clf2 = RandomForestClassifier()
@@ -124,17 +124,13 @@ class AlgorithmsEvaluation:
               'warm_start': [False]}
 		mlp = GridSearchCV(mlp, param_grid=param_grid,
                    cv=self.__DATASETSPLIT, verbose=False, pre_dispatch='2*n_jobs', scoring='r2')
-		
-		
-		
+		models.append(('ANN', mlp))
 		return models
-        
 
 	def _printResults(self, result):
 		msg = "Accuracy: %0.2f (+/- %0.2f)" % (result[2], 2*result[3])
 		self.__evaluationResults.write(result[0] + "  " + msg + '\n')
     
-
 #############################################################################################################################
     
 if __name__ == "__main__":

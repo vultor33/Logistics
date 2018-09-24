@@ -20,6 +20,7 @@ class MachineLearningOptions:
 		self.data = data
 
 	def setMLApplication(self, application):
+		self.__ML_APPLICATION = application
 		if application == self.__ML_APP_CLASSIFICATION:
 			self.__scoring = 'accuracy'
 		elif application == self.__ML_APP_REGRESSION:
@@ -61,9 +62,15 @@ class MachineLearningOptions:
 
 	def setScoringMethod(self, value):
 		self.__scoring = value
-		
+
+	def getScoringMethod(self):
+		return self.__scoring
+
 	def setCrossValidationDataSplit(self, value):
 		self.__crossValidationDataSplit = value
+	
+	def getCrossValidationDataSplit(self):
+		return self.__crossValidationDataSplit
 
 	def _setConstants(self):
 		self.__ML_APP_CLASSIFICATION = 'classification'

@@ -69,12 +69,13 @@ def getKey():
 
 if __name__ == "__main__":
 	pKey = getKey()
+	NPoints = 7000
 	sgm = CreateGoogleMapsDirectionDatabase(pKey)
 	p1 = [-17.894595, -41.525351]
 	dlatMax = 0.05331699999999984
 	dlngMax = 0.03347699999999776
-	coord1 = sgm.generateRandomRectangle(p1,dlatMax,dlngMax, 5)
-	coord2 = sgm.generateRandomRectangle(p1,dlatMax,dlngMax, 5)
+	coord1 = sgm.generateRandomRectangle(p1,dlatMax,dlngMax, NPoints)
+	coord2 = sgm.generateRandomRectangle(p1,dlatMax,dlngMax, NPoints)
 	for i in range(len(coord1[0])):
 		sgm.saveCoord([coord1[0][i],coord1[1][i]],[coord2[0][i],coord2[1][i]])
 
