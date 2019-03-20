@@ -1,4 +1,11 @@
-__*
-*.txt
+*.json
 *.csv
+*.zip
+.ipy*
+*.txt
+*pycache*
+*.png
+*.h5
+
+
 
