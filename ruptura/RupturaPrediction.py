@@ -17,6 +17,9 @@ class RupturaPrediction:
         scoreY = self._validationSteps(Ytest, model)
         self.plotScore(scoreY)
    
+    def getScore(self):
+        return self.__score
+
     def plotScore(self, scoreY):
         dataScore = []
         scorePred = self.getScore()
@@ -34,7 +37,7 @@ class RupturaPrediction:
         scoreBatch = self.calculateScoreOfBatch(annPrediction)
         self.__score.append(scoreBatch)
 
-    def addFirstY(self, Ytest): # First Y is included in training batch, so we can use it for validation
+    def addFirstY(self, Ytest): # First Y is included in training batch, so we cant use it for validation
         points = self.getStepPoints(Ytest,0)
         self.walk(points)
     
