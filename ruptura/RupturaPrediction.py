@@ -1,5 +1,6 @@
-import pandas as pd
+import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from core.DataExploration import DataExploration
 
 class RupturaPrediction:
@@ -21,9 +22,6 @@ class RupturaPrediction:
 
     def getX(self):
         return self.__X
-        
-    def getScore(self):
-        return np.array(self.__score)
         
     def getWalkSteps(self):
         return self.__walkCounter
@@ -48,6 +46,26 @@ class RupturaPrediction:
         de = DataExploration(dataScore)
         de.setNpoints(self.PLOT_POINTS)
         de.graphicInadimplenciaXContinuum(dataScore, 'score')
+
+    def plotAllBatches(self):
+        for i_batch in range(self.__score.shape[1]):
+            self.plotSampleOfBatch(i_batch)
+    
+    def plotSampleOfBatch(self, i_batch): #need to validate first
+        if self.__walkCounter == 0:
+            raise Exception('Cant plot sample, need to validate first')
+        pred = self.__score[:,i_batch]
+        real = self.__realValues[:,i_batch]
+        x = range(len(pred))
+        fig = plt.figure()
+        name = 'amostra-' + str(i_batch) + '-previsto-vs-real'
+        plt.title(name)
+        plt.ylim((-0.1, 1.1))  
+        plt.plot(x, pred, 'r', label='PREVISTO, x') # x
+        plt.plot(x, real, 'b', label='REAL, y') # y
+        plt.legend(loc='best')
+        fig.savefig(name + '.png',dpi=150)
+        plt.close(fig)
     
     def step(self, model):
         self.walk()
@@ -68,6 +86,12 @@ class RupturaPrediction:
             Xnext.append(np.append(xBatch,[point],axis=0))  #add point
         self.__walkCounter += 1
         self.__X = np.array(Xnext)
+        
+    def _createDesconhecidoPoints(self):
+        points = []
+        for i in range(self.__X.shape[0]):
+            points.append(self.DESCONHECIDO)
+        return np.array(points) 
 
     def calculateScoreOfBatch(self, pointsBatch, time_step = -1):
         points = self.getStepPoints(pointsBatch, time_step)
@@ -82,13 +106,8 @@ class RupturaPrediction:
             self.step(model)
             self.__realValues.append(self.calculateScoreOfBatch(Ytest,i))
         self.__realValues = np.array(self.__realValues)
+        self.__score = np.array(self.__score)
     
-    def _createDesconhecidoPoints(self):
-        points = []
-        for i in range(self.__X.shape[0]):
-            points.append(self.DESCONHECIDO)
-        return np.array(points) 
-
     def calculateDataScore(self):
         dataScore = []
         for i_batch in range(self.__realValues.shape[1]):
@@ -106,6 +125,7 @@ class RupturaPrediction:
                 dataScore.append((rupScore,0))   
         dataScore = pd.DataFrame(data=dataScore,columns=['score','Inadimplente'])
         return dataScore
+    
 
 
 
