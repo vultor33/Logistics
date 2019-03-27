@@ -29,7 +29,7 @@ class CreateBatch: # trocar x por event
             json.dump(batch, outfile)
     
     def loadBatch(self, fileName = 'rupturaTable.json'):
-        with open('rupturaTable.json') as f:
+        with open(fileName) as f:
             batchData = json.load(f)
         return batchData
 
@@ -44,7 +44,6 @@ class CreateBatch: # trocar x por event
         amostrasItem = self._convertToDict(data, itemName)
         amostras = self.applyOneHotEncoder(amostrasItem, referenceDate)
         return amostras
-        #return self._applyOneHotEncoder(amostrasItem) refazer o oneHotEncoder
 
 ###################################################################################################################    
 # SEARCH ITEM IN TABLES
@@ -120,6 +119,8 @@ class CreateBatch: # trocar x por event
             return [0,0,1,0]
         elif element == self.DESCONHECIDO:
             return [0,0,0,1]
+        else:
+            return 'ELEMENT NOT RECOGNIZED:  ' + str(element)
             
     def decriptEncoder(self, vector):
         if vector == [1,0,0,0]:
@@ -130,11 +131,12 @@ class CreateBatch: # trocar x por event
             return self.RUPTURA_LOJA
         elif vector == [0,0,0,1]:
             return self.DESCONHECIDO
+        else:
+            return 'ELEMENT NOT RECOGNIZED:  ' + str(vector)
         
 ###################################################################################################################    
 # APPLY ONE HOT ENCODER
 ###################################################################################################################    
-
 
     def applyOneHotEncoder(self, amostras, referenceDate):
         amostrasTodosClientes = {}
@@ -154,8 +156,8 @@ class CreateBatch: # trocar x por event
         event = self._getEvent(x2,amostras,cliente)
         yAmostra.append(event)
         yTest = []
-        for date in range(x2 + 2, x2 + 2 + self.TEST_DAYS):
-            event = self._getEvent(date,amostras,cliente)
+        for date in range(x2 + 1, x2 + 1 + self.TEST_DAYS):
+            event = self._getEvent(date, amostras, cliente)
             yTest.append(event)
         amostraEncoded = self._encodeAmostra(cliente, xAmostra, yAmostra, yTest)
         return amostraEncoded
@@ -182,8 +184,7 @@ class CreateBatch: # trocar x por event
 ###################################################################################################################    
 
     def defineTrainWindowDates(self, referenceDate, window = 60):
-        y2 = self._dateToNumber(referenceDate)
-        x2 = y2 - 1
+        x2 = self._dateToNumber(referenceDate)
         x1 = x2 - window
         return [x1, x2]    
 
@@ -194,7 +195,6 @@ class CreateBatch: # trocar x por event
         ano = int(momento[2].split(' ')[0])
         now = datetime.datetime.now()
         return (datetime.datetime(ano, mes, dia) - now).days    
-
 
         
 ######### APAGAR
@@ -225,25 +225,4 @@ class CreateBatch: # trocar x por event
         values = collections.Counter([str(x) for x in amostra])
         values = list(values.values())
         return len(values) <= 1
-
-    
-    
-    
-    
-    def _applyOneHotEncoder(self, amostrasItem):
-        for cliente in amostrasItem:
-            datas = amostrasItem[cliente]['data']
-            x = amostrasItem[cliente]['x']
-            oneHot = []
-            for i in range(max(datas) + 1):
-                if i in datas:
-                    iIndex = datas.index(i)
-                    oneHot.append(self.oneHotEncoder(x[iIndex]))
-                else:
-                    oneHot.append(self.oneHotEncoder(self.DESCONHECIDO))
-            amostrasItem[cliente] = oneHot
-        return amostrasItem
-
-        
-        
         

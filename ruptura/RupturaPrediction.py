@@ -10,46 +10,14 @@ class RupturaPrediction:
         self.__Xstart = X.copy()
         self.__X = self.__Xstart.copy()
         self.__score = []
+        self.__realValues = []
         self.__walkCounter = 0
     
-    def validate(self, Ytest, model):
-        self.addFirstY(Ytest)
-        scoreY = self._validationSteps(Ytest, model)
-        self.plotScore(scoreY)
-   
     def getScore(self):
         return self.__score
 
-    def plotScore(self, scoreY):
-        dataScore = []
-        scorePred = self.getScore()
-        for i in range(scoreY.shape[0]):
-            for j in range(scoreY.shape[1]):
-                dataScore.append([round(100*scorePred[i][j]), str(scoreY[i][j])])
-        dataScore = pd.DataFrame(data=dataScore,columns=['score','Inadimplente'])
-        de = DataExploration(dataScore)
-        de.setNpoints(self.PLOT_POINTS)
-        de.graphicInadimplenciaXContinuum(dataScore, 'score')  # MELHORAR ESSE GRAFICO
-    
-    def step(self, model):
-        self.walk()
-        annPrediction = model.predict(self.__X, batch_size=self.__X.shape[0], verbose=0)
-        scoreBatch = self.calculateScoreOfBatch(annPrediction)
-        self.__score.append(scoreBatch)
-
-    def addFirstY(self, Ytest): # First Y is included in training batch, so we cant use it for validation
-        points = self.getStepPoints(Ytest,0)
-        self.walk(points)
-    
-    def walk(self, points = []):
-        if len(points) == 0:
-            points = self._createDesconhecidoPoints()
-        Xnext = []
-        for xBatch, point in zip(self.__X, points):
-            xBatch = np.array(xBatch[1:])                   #throw first value
-            Xnext.append(np.append(xBatch,[point],axis=0))  #add point
-        self.__walkCounter += 1
-        self.__X = np.array(Xnext)
+    def getRealValues(self):
+        return self.__realValues
 
     def getX(self):
         return self.__X
@@ -75,6 +43,32 @@ class RupturaPrediction:
             points.append(batchStep)
         return np.array(points)
 
+    def plotScore(self, dataScore):
+        dataScore.loc[:,'Inadimplente'] = [str(x) for x in dataScore.loc[:,'Inadimplente'].values]
+        de = DataExploration(dataScore)
+        de.setNpoints(self.PLOT_POINTS)
+        de.graphicInadimplenciaXContinuum(dataScore, 'score')
+    
+    def step(self, model):
+        self.walk()
+        annPrediction = model.predict(self.__X, batch_size=self.__X.shape[0], verbose=0)
+        scoreBatch = self.calculateScoreOfBatch(annPrediction)
+        self.__score.append(scoreBatch)
+
+    def addFirstPrediction(self, Y): # First Y is included in training batch, so we cant use it for validation
+        points = self.getStepPoints(Y,-1)
+        self.walk(points)
+
+    def walk(self, points = []):
+        if len(points) == 0:
+            points = self._createDesconhecidoPoints()
+        Xnext = []
+        for xBatch, point in zip(self.__X, points):
+            xBatch = np.array(xBatch[1:])                   #throw first value
+            Xnext.append(np.append(xBatch,[point],axis=0))  #add point
+        self.__walkCounter += 1
+        self.__X = np.array(Xnext)
+
     def calculateScoreOfBatch(self, pointsBatch, time_step = -1):
         points = self.getStepPoints(pointsBatch, time_step)
         score = []
@@ -82,16 +76,36 @@ class RupturaPrediction:
             score.append(point[1] + point[2])
         return score
 
-    def _validationSteps(self,Ytest, model):
-        scoreY = []
+    def validate(self,Ytest, model):
+        yRealValues = []
         for i in range(self.VALIDATION_DAYS):
             self.step(model)
-            scoreY.append(self.calculateScoreOfBatch(Ytest,i+1))
-        return np.array(scoreY)
+            self.__realValues.append(self.calculateScoreOfBatch(Ytest,i))
+        self.__realValues = np.array(self.__realValues)
     
     def _createDesconhecidoPoints(self):
         points = []
         for i in range(self.__X.shape[0]):
             points.append(self.DESCONHECIDO)
         return np.array(points) 
-    
+
+    def calculateDataScore(self):
+        dataScore = []
+        for i_batch in range(self.__realValues.shape[1]):
+            predictions = []
+            isRuptura = False
+            for day in range(self.__realValues.shape[0]):
+                predictions.append(self.__score[day][i_batch])
+                if self.__realValues[day][i_batch] == 1:
+                    rupScore = int(100*np.median(predictions))
+                    dataScore.append((rupScore,1))
+                    isRuptura = True
+                    break
+            if not isRuptura:
+                rupScore = int(100*np.median(predictions))
+                dataScore.append((rupScore,0))   
+        dataScore = pd.DataFrame(data=dataScore,columns=['score','Inadimplente'])
+        return dataScore
+
+
+
