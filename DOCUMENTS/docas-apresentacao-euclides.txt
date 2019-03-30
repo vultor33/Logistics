@@ -1,0 +1,64 @@
+Projeto de IOT com o prime builder para saber se o caminhão chegou.
+
+
+Anotacoes
+
+????
+Eu posso descarregar, por exemplo, em sorocaba. E depois buscar embalagens em ituiutaba
+
+Existe restrição de embalagens em relação ao tamanho do caminhão.
+
+Esse QR code já está sendo ativada?
+-- Você tem os dados deste quadro branco? - nao tem esse histórico
+
+As vezes está faltando embalagens no fornecedor, 
+o caminhão vem buscar embalagens na toyota para levar.
+
+
+????
+
+O fornecedor tem como avisar que vai atrasar? - Poderia ter, ainda nao tem isso.
+
+Docas individuais - 
+inicia o processo não pode alterar mais.
+Utiliza peças específicas. Por exemplo, motor é só motor.
+Limitações na realocação.
+
+40 caminhões ficam rodando 24 horas por dia.
+Tem 2 caminhões extras que ficam para resolver problemas.
+Deveria ter um sentimento de urgência para priorizar os caminhões.
+
+A toyota manda planejamento quinzenal já pronto.
+
+A embalagaem tipo o hack que segura as portas.
+Esse hack e descarregado em um lugar e depois e outro
+caminhão que pega esse hack para devolver.
+
+
+Buscas no google:
+- sider carreta
+- embalagens milk run
+
+Horários de troca de turnos nas docas, tudo para.
+
+Tem um planejamento certo. Mas não conta com atrasos.
+Ainda tem caminhoes extras que aparecem como necessários.
+Atraso processo de fabricação de produtos. Tem que ter caminhão extras.
+O fornecedor manda esse caminhão para completar o que estava faltando.
+
+Caminhão extra pode furar a fila também.
+
+
+Uma segunda empilhadeira é alocada para tentar compensar o atraso.
+
+
+
+
+
+
+
+
+
+
+
+
