@@ -20,6 +20,27 @@ class CreateBatch: # trocar x por event
         self.NOME_CLIENTE = 'Nome do cliente'
         self.TEST_DAYS = 7
 
+    def batch(self, fileName, sampleShape = (60,4)):
+        amostras = self.loadBatch(fileName)
+        print('WARNING - need error handling on samples')
+        X = []
+        Y = []
+        Ytest = []
+        for key in amostras:
+            x = np.array(amostras[key]['x'])
+            y = np.array(amostras[key]['y'])
+            yt = np.array(amostras[key]['ytest'])
+            if x.shape != sampleShape:
+                continue
+            X.append(x)
+            Y.append(y)
+            Ytest.append(yt)
+        X = np.array(X)
+        Y = np.array(Y)
+        Ytest = np.array(Ytest)
+        return[X, Y, Ytest]
+
+
 ###################################################################################################################    
 # FILE HANDLING
 ###################################################################################################################    
@@ -196,33 +217,3 @@ class CreateBatch: # trocar x por event
         now = datetime.datetime.now()
         return (datetime.datetime(ano, mes, dia) - now).days    
 
-        
-######### APAGAR
-
-
-    # NAO SEI SE AINDA E ADEQUADO
-    def batch(self, amostras, nDiasTreino = 70, nDiasTeste = 10):
-        nTotal = nDiasTreino + nDiasTeste
-        Xtrain = []
-        Ytrain = []
-        Ytest = []
-        for cliente in amostras:
-            if self._checkAmostra(amostras[cliente]):
-                continue
-            if len(amostras[cliente]) > nTotal:
-                xtrain = np.array(amostras[cliente][0:nDiasTreino])
-                ytrain = np.array(amostras[cliente][1:nDiasTreino + 1])
-                ytest = np.array(amostras[cliente][nDiasTreino:nTotal])
-                Xtrain.append(xtrain)
-                Ytrain.append(ytrain)
-                Ytest.append(ytest)
-        Xtrain = np.array(Xtrain)
-        Ytrain = np.array(Ytrain)
-        Ytest = np.array(Ytest)
-        return [Xtrain,Ytrain,Ytest]
-
-    def _checkAmostra(self, amostra):
-        values = collections.Counter([str(x) for x in amostra])
-        values = list(values.values())
-        return len(values) <= 1
-        

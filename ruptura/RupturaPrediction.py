@@ -97,7 +97,10 @@ class RupturaPrediction:
         points = self.getStepPoints(pointsBatch, time_step)
         score = []
         for point in points:
-            score.append(point[1] + point[2])
+            if point[0] == 1:
+                score.append(-1)
+            else:
+                score.append(point[1] + point[2])
         return score
 
     def validate(self,Ytest, model):
@@ -118,6 +121,11 @@ class RupturaPrediction:
                 if self.__realValues[day][i_batch] == 1:
                     rupScore = int(100*np.median(predictions))
                     dataScore.append((rupScore,1))
+                    isRuptura = True
+                    break
+                elif self.__realValues[day][i_batch] == -1:  
+                    rupScore = int(100*np.median(predictions))
+                    dataScore.append((rupScore,0))
                     isRuptura = True
                     break
             if not isRuptura:
