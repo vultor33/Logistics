@@ -19,6 +19,7 @@ class CreateBatch: # trocar x por event
         self.DATA_OCORRENCIA = 'dataDeOcorrencia'
         self.NOME_CLIENTE = 'Nome do cliente'
         self.TEST_DAYS = 7
+        self.titles = []
 
     def batch(self, fileName, sampleShape = (60,4)):
         amostras = self.loadBatch(fileName)
@@ -35,6 +36,7 @@ class CreateBatch: # trocar x por event
             X.append(x)
             Y.append(y)
             Ytest.append(yt)
+            self.titles.append(key)
         X = np.array(X)
         Y = np.array(Y)
         Ytest = np.array(Ytest)
