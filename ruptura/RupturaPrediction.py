@@ -119,17 +119,17 @@ class RupturaPrediction:
             for day in range(self.__realValues.shape[0]):
                 predictions.append(self.__score[day][i_batch])
                 if self.__realValues[day][i_batch] == 1:
-                    rupScore = int(100*np.median(predictions))
+                    rupScore = int(100*np.max(predictions))
                     dataScore.append((rupScore,1))
                     isRuptura = True
                     break
                 elif self.__realValues[day][i_batch] == -1:  
-                    rupScore = int(100*np.median(predictions))
+                    rupScore = int(100*np.max(predictions))
                     dataScore.append((rupScore,0))
                     isRuptura = True
                     break
             if not isRuptura:
-                rupScore = int(100*np.median(predictions))
+                rupScore = int(100*np.max(predictions))
                 dataScore.append((rupScore,0))   
         dataScore = pd.DataFrame(data=dataScore,columns=['score','Inadimplente'])
         return dataScore
