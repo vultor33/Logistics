@@ -60,7 +60,15 @@ class CreateBatch: # trocar x por event
 # CREATE SAMPLES
 ###################################################################################################################    
 
-    def create(self, data, itemName, referenceDate):
+    def create(self, data, word, referenceDate):
+        allProds = self._searchAllProducts(word, data)
+        allSamples = {}
+        for prod in allProds:
+            sample = self.createItem(data, prod, referenceDate)
+            allSamples.update(dict(sample))
+        return allSamples
+
+    def createItem(self, data, itemName, referenceDate):
         itemIndexes = self.searchFlag(itemName, data, exactMatch = True)[itemName]
         data = data.loc[itemIndexes,:].copy()
         data = data.reset_index(drop=True)
@@ -68,9 +76,20 @@ class CreateBatch: # trocar x por event
         amostras = self.applyOneHotEncoder(amostrasItem, referenceDate)
         return amostras
 
+    
+
+
 ###################################################################################################################    
 # SEARCH ITEM IN TABLES
 ###################################################################################################################    
+
+    def _searchAllProducts(self, word, data):
+        products = list(collections.Counter(data.loc[:,self.PRODUTO]))
+        allProd  = []
+        for prod in products:
+            if word in prod:
+                allProd.append(prod)
+        return allProd
         
     def searchFlag(self, flag, data, columnName = 'Produto', exactMatch = False):
         itemsFlag = {}
