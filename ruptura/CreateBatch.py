@@ -4,8 +4,14 @@ import numpy as np
 import re
 import datetime
 
-class CreateBatch: # trocar x por event
-    def __init__(self):
+from ruptura.TableToDictionary import TableToDictionary
+from ruptura.Encoder import Encoder
+
+class CreateBatch:
+    def __init__(self, version):
+        self.__version = version
+        self.__tableToDictionary = TableToDictionary(version)
+        self.__encoder = Encoder(version)
         self.PRESENCA = 'Presen a'
         self.RUPTURA_LOJA = 'Ruptura em Loja'
         self.REPOSICAO = 'Reposi o'
@@ -42,7 +48,6 @@ class CreateBatch: # trocar x por event
         Ytest = np.array(Ytest)
         return[X, Y, Ytest]
 
-
 ###################################################################################################################    
 # FILE HANDLING
 ###################################################################################################################    
@@ -72,12 +77,10 @@ class CreateBatch: # trocar x por event
         itemIndexes = self.searchFlag(itemName, data, exactMatch = True)[itemName]
         data = data.loc[itemIndexes,:].copy()
         data = data.reset_index(drop=True)
-        amostrasItem = self._convertToDict(data, itemName)
-        amostras = self.applyOneHotEncoder(amostrasItem, referenceDate)
+        #return self.__tableToDictionary.convertToDict(data, itemName)
+        amostrasItem = self.__tableToDictionary.convertToDict(data, itemName) #continuando
+        amostras = self.__encoder.applyOneHotEncoder(amostrasItem, referenceDate)
         return amostras
-
-    
-
 
 ###################################################################################################################    
 # SEARCH ITEM IN TABLES

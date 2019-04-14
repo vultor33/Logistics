@@ -35,7 +35,7 @@ class RupturaNeuralNetwork:
     
     def crossEntropyWeights(self, size):
         batch_size, time_steps = size
-        weightVector = [1,1,1,0.1]
+        weightVector = [1,1,0.1]  #  previous weightVector = [1,1,1,0.1]
         w_array = []
         for i in range(batch_size):
             auxWeight = []

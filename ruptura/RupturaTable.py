@@ -16,8 +16,8 @@ class RupturaTable:
     
     def generate(self, files, clipData):
         self.loadFiles(files)
-        self.cleanData()
         self.removeOutliers()
+        self.cleanData()
         self.convertDataFormat()
         self.clipDates(clipData[0], clipData[1])
     
