@@ -9,6 +9,7 @@ class RupturaTable:
         self.OCORRENCIA2 = 'Ocorr ncia2'
         self.DATA_OCORRENCIA = 'dataDeOcorrencia'
         self.DATA_ENCERRAMENTO_OS = 'Data Hora de encerramento da OS'
+        self.DIA_SEMANA = 'DiaDaSemana'
         
         self.__now = datetime.datetime.now()
         self.__data = []
@@ -44,18 +45,27 @@ class RupturaTable:
     
     def convertDataFormat(self):
         allDates = []
+        weekDays = []
         for i in self.__data.index:
             dateI = self.__data.loc[i,self.DATA_ENCERRAMENTO_OS]
+            weekDay = self.datetimeFromStringDate(dateI).weekday()
+            weekDays.append(weekDay)
             dateI = int(self.daysFromNowConvertDate(dateI))
             allDates.append(dateI)
         self.__data[self.DATA_OCORRENCIA] = allDates    
+        self.__data[self.DIA_SEMANA] = weekDays
         
     def daysFromNowConvertDate(self, dateI):
+        dateI = self.datetimeFromStringDate(dateI)
+        return (dateI - self.__now).days    
+
+    def datetimeFromStringDate(self, dateI):
         momento = dateI.split('/')
         dia = int(momento[0])
         mes = int(momento[1])
         ano = int(momento[2].split(' ')[0])
-        return (datetime.datetime(ano, mes, dia) - self.__now).days    
+        return datetime.datetime(ano, mes, dia)
+    
 
     def clipDates(self, start, end):
         start = self.daysFromNowConvertDate(start)
