@@ -127,9 +127,6 @@ class RupturaPrediction:
                     dataScore.append((rupScore,0))
                     isRuptura = True
                     break
-            #if not isRuptura:
-                #rupScore = int(100*np.max(predictions))
-                #dataScore.append((rupScore,-1))   
         dataScore = pd.DataFrame(data=dataScore,columns=['score','Inadimplente'])
         return dataScore
     

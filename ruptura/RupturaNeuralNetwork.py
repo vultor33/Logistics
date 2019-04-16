@@ -33,9 +33,8 @@ class RupturaNeuralNetwork:
             model.compile(loss = custom_loss,optimizer='adam')
         return model
     
-    def crossEntropyWeights(self, size):
+    def crossEntropyWeights(self, size, weightVector):
         batch_size, time_steps = size
-        weightVector = [1,1,0.1]  #  previous weightVector = [1,1,1,0.1]
         w_array = []
         for i in range(batch_size):
             auxWeight = []
@@ -45,14 +44,14 @@ class RupturaNeuralNetwork:
         w_array = tf.convert_to_tensor(np.array(w_array), dtype='float')
         return w_array
         
-    def getCustomLoss(self, Ytrain):
+    def getCustomLoss(self, size, weightVector):
         def w_categorical_crossentropy(y_true, y_pred, weights):
             mask = weights * y_true
             mask = K.max(mask, axis=2)
             cross_ent = K.categorical_crossentropy(y_true,y_pred, from_logits=False)
             return cross_ent * mask
 
-        custom_loss = partial(w_categorical_crossentropy, weights=self.crossEntropyWeights(Ytrain))
+        custom_loss = partial(w_categorical_crossentropy, weights=self.crossEntropyWeights(size, weightVector))
         custom_loss.__name__ ='w_categorical_crossentropy'
         return custom_loss
             
