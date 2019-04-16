@@ -73,9 +73,8 @@ class RupturaPrediction:
         scoreBatch = self.calculateScoreOfBatch(annPrediction)
         self.__score.append(scoreBatch)
 
-    def addFirstPrediction(self, Y): # First Y is included in training batch, so we cant use it for validation
-        points = self.getStepPoints(Y,-1)
-        self.walk(points)
+    def addLastX(self, lastX): # First Y is included in training batch, so we cant use it for validation
+        self.walk(lastX)
 
     def walk(self, points = []):
         if len(points) == 0:
