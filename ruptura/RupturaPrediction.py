@@ -100,7 +100,7 @@ class RupturaPrediction:
             if point[0] == 1:
                 score.append(-1)
             else:
-                score.append(point[1] + point[2])
+                score.append(point[1])
         return score
 
     def validate(self,Ytest, model):
