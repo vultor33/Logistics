@@ -11,10 +11,10 @@ class Encoder:
         for client in sample:
             if not self._checkClient(sample, client):
                 continue
-            xSample = self._defineX(sample, client, referenceDate)  #try sample[client]
+            xSample, lastX = self._defineX(sample, client, referenceDate)  #try sample[client]
             ySample = self._defineY(xSample, sample, client, referenceDate)
             yTest = self._defineYTest(sample, client, referenceDate)
-            encodedSample = self._encodeSample(client, xSample, ySample, yTest)
+            encodedSample = self._encodeSample(client, xSample, ySample, yTest, lastX)
             allSamples.update(encodedSample)
         return allSamples
 
@@ -24,7 +24,19 @@ class Encoder:
         for date in range(x1,x2):
             event = self._getXEvent(date, sample, client)
             xSample.append(event)
-        return xSample
+        lastX = self._getXEvent(x2, sample, client)
+        return [xSample, lastX]
+    
+    def _getXEvent(self, date, sample, client):
+        if date in sample[client]['data']:
+            dateIndex = sample[client]['data'].index(date)
+            event = list(sample[client]['x'][dateIndex])
+            event.append(0) # UNKNOW = False
+        else:
+            size = len(sample[client]['x'][0])
+            event = [0*x for x in range(size)]
+            event.append(1)
+        return event
 
     def _defineY(self, xSample, sample, client, referenceDate):
         _, x2 = self.defineTrainWindowDates(referenceDate)
@@ -43,17 +55,6 @@ class Encoder:
             yTest.append(event)
         return yTest
     
-    def _getXEvent(self, date, sample, client):
-        if date in sample[client]['data']:
-            dateIndex = sample[client]['data'].index(date)
-            event = sample[client]['x'][dateIndex]
-            event.append(0) # UNKNOW = False
-        else:
-            size = len(sample[client]['x'][0])
-            event = [0*x for x in range(size)]
-            event.append(1)
-        return event
-    
     def _getYEvent(self, date, sample, client):
         xEvent = self._getXEvent(date, sample, client)
         return self._calculateYEventFromX(xEvent)
@@ -66,12 +67,13 @@ class Encoder:
         empty = len(sample[client]['x']) != 0
         return empty 
 
-    def _encodeSample(self, cliente, xAmostra, yAmostra, yTest):
+    def _encodeSample(self, cliente, xAmostra, yAmostra, yTest, lastX):
         amostraEncoded = {}
         amostraEncoded[cliente] = {}
         amostraEncoded[cliente]['x'] = xAmostra
         amostraEncoded[cliente]['y'] = yAmostra
         amostraEncoded[cliente]['ytest'] = yTest
+        amostraEncoded[cliente]['lastX'] = lastX
         return amostraEncoded
 
     

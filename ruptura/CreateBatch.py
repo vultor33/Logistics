@@ -13,6 +13,7 @@ class CreateBatch:
         self.__tableToDictionary = TableToDictionary(version)
         self.__encoder = Encoder(version)
         self.titles = []
+        self.PRODUTO = 'Produto'
 
     def batch(self, fileName, sampleShape = (60,4)):
         amostras = self.loadBatch(fileName)
@@ -20,10 +21,12 @@ class CreateBatch:
         X = []
         Y = []
         Ytest = []
+        LastX = []
         for key in amostras:
             x = np.array(amostras[key]['x'])
             y = np.array(amostras[key]['y'])
             yt = np.array(amostras[key]['ytest'])
+            LastX.append(amostras[key]['lastX'])
             if x.shape != sampleShape:
                 continue
             X.append(x)
@@ -33,7 +36,8 @@ class CreateBatch:
         X = np.array(X)
         Y = np.array(Y)
         Ytest = np.array(Ytest)
-        return[X, Y, Ytest]
+        LastX = np.array(LastX)
+        return[X, Y, Ytest, LastX]
 
 ###################################################################################################################    
 # FILE HANDLING
@@ -64,8 +68,7 @@ class CreateBatch:
         itemIndexes = self.searchFlag(itemName, data, exactMatch = True)[itemName]
         data = data.loc[itemIndexes,:].copy()
         data = data.reset_index(drop=True)
-        #return self.__tableToDictionary.convertToDict(data, itemName)
-        amostrasItem = self.__tableToDictionary.convertToDict(data, itemName) #continuando
+        amostrasItem = self.__tableToDictionary.convertToDict(data, itemName)
         amostras = self.__encoder.applyOneHotEncoder(amostrasItem, referenceDate)
         return amostras
 
