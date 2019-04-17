@@ -60,8 +60,12 @@ class Encoder:
         return self._calculateYEventFromX(xEvent)
         
     def _calculateYEventFromX(self, xEvent):
-        yEvent = [xEvent[0], xEvent[1] + xEvent[2], xEvent[3]]
-        return yEvent 
+        if self.__version[0:4] == '0-0-':
+            yEvent = [xEvent[0], xEvent[1] + xEvent[2], xEvent[3]]
+            return yEvent 
+        if self.__version[0:4] == '0-1-':
+            yEvent = [xEvent[0], xEvent[2]]
+            return yEvent
         
     def _checkClient(self, sample, client):
         empty = len(sample[client]['x']) != 0

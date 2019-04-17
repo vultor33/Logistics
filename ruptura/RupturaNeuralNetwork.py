@@ -16,20 +16,20 @@ class RupturaNeuralNetwork:
             json_file.write(model_json)
         model.save_weights(self.MODEL_NAME + ".h5")    
 
-    def loadModel(self, size = []):
+    def loadModel(self, size, weightVector):
         json_file = open(self.MODEL_NAME + '.json', 'r')
         loaded_model_json = json_file.read()
         json_file.close()
         loaded_model = model_from_json(loaded_model_json)
         loaded_model.load_weights(self.MODEL_NAME + ".h5")
-        loaded_model = self.compileModel(loaded_model, size)
+        loaded_model = self.compileModel(loaded_model, size, weightVector)
         return loaded_model
     
-    def compileModel(self, model, size):
+    def compileModel(self, model, size, weightVector):
         if len(size) == 0:
             model.compile(loss = self.__DEFAULT_LOSS,optimizer='adam')
         else:
-            custom_loss = self.getCustomLoss(size)
+            custom_loss = self.getCustomLoss(size, weightVector)
             model.compile(loss = custom_loss,optimizer='adam')
         return model
     
