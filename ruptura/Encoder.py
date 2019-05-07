@@ -1,71 +1,49 @@
 import datetime
+from ruptura.EncoderX import EncoderX
+from ruptura.EncoderY import EncoderY
 
 class Encoder:
     def __init__(self, version):
-        self.__version = version
         self.TEST_DAYS = 7
+        self.__version = version
         self.__now = datetime.datetime.now()
+        self.__encoderX = EncoderX(version)
+        self.__encoderY = EncoderY(version)
 
     def applyOneHotEncoder(self, sample, referenceDate):
         allSamples = {}
         for client in sample:
             if not self._checkClient(sample, client):
                 continue
-            xSample, lastX = self._defineX(sample, client, referenceDate)  #try sample[client]
-            ySample = self._defineY(xSample, sample, client, referenceDate)
-            yTest = self._defineYTest(sample, client, referenceDate)
+            xSample, lastX = self._defineX(sample[client], referenceDate)      # try sample[client]
+            ySample, yTest = self._defineY(sample[client], referenceDate)
             encodedSample = self._encodeSample(client, xSample, ySample, yTest, lastX)
             allSamples.update(encodedSample)
         return allSamples
 
-    def _defineX(self, sample, client, referenceDate):
+    def getUnknwows(self):
+        return [self.__encoderX.getXUnknwow(), self.__encoderY.getYUnknwow()]
+
+    def _defineX(self, sample, referenceDate):
         x1, x2 = self.defineTrainWindowDates(referenceDate)
         xSample = []
         for date in range(x1,x2):
-            event = self._getXEvent(date, sample, client)
+            event = self.__encoderX.calculateXEvent(date, sample)
             xSample.append(event)
-        lastX = self._getXEvent(x2, sample, client)
+        lastX = self.__encoderX.calculateXEvent(x2, sample)
         return [xSample, lastX]
-    
-    def _getXEvent(self, date, sample, client):
-        if date in sample[client]['data']:
-            dateIndex = sample[client]['data'].index(date)
-            event = list(sample[client]['x'][dateIndex])
-            event.append(0) # UNKNOW = False
-        else:
-            size = len(sample[client]['x'][0])
-            event = [0*x for x in range(size)]
-            event.append(1)
-        return event
 
-    def _defineY(self, xSample, sample, client, referenceDate):
-        _, x2 = self.defineTrainWindowDates(referenceDate)
-        ySample = list(xSample)
-        ySample.pop(0)
-        ySample = [self._calculateYEventFromX(xEvent) for xEvent in ySample]
-        event = self._getYEvent(x2, sample, client)
-        ySample.append(event)
-        return ySample
-
-    def _defineYTest(self, sample, client, referenceDate):
-        _, x2 = self.defineTrainWindowDates(referenceDate)
+    def _defineY(self, sample, referenceDate):
+        x1, x2 = self.defineTrainWindowDates(referenceDate)
+        ySample = []
+        for date in range(x1 + 1, x2 + 1):
+            event = self.__encoderY.calculateYEvent(date, sample)
+            ySample.append(event)
         yTest = []
         for date in range(x2 + 1, x2 + 1 + self.TEST_DAYS):
-            event = self._getYEvent(date, sample, client)
+            event = self.__encoderY.calculateYEvent(date, sample)
             yTest.append(event)
-        return yTest
-    
-    def _getYEvent(self, date, sample, client):
-        xEvent = self._getXEvent(date, sample, client)
-        return self._calculateYEventFromX(xEvent)
-        
-    def _calculateYEventFromX(self, xEvent):
-        if self.__version[0:4] == '0-0-':
-            yEvent = [xEvent[0], xEvent[1] + xEvent[2], xEvent[3]]
-            return yEvent 
-        if self.__version[0:4] == '0-1-':
-            yEvent = [xEvent[0], xEvent[2]]
-            return yEvent
+        return ySample, yTest
         
     def _checkClient(self, sample, client):
         empty = len(sample[client]['x']) != 0
@@ -80,7 +58,6 @@ class Encoder:
         amostraEncoded[cliente]['lastX'] = lastX
         return amostraEncoded
 
-    
 ###################################################################################################################    
 # CLIP DATES
 ###################################################################################################################    

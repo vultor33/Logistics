@@ -23,7 +23,7 @@ class TableToDictionary:
         for i in data.index:
             key = self._getKey(data, i, itemName)
             dateI = data.loc[i,self.DATA_OCORRENCIA]
-            xValue = self._generateXfromTable(data, i)
+            xValue = self._extractAllRelevantInformation(data, i)
             self._addToSample(sampleItem, key, dateI, xValue)
         return sampleItem
     
@@ -40,40 +40,12 @@ class TableToDictionary:
         itemName = re.sub('[^A-Za-z0-9]+', ' ', str(itemName))
         return str(client) + '-' + str(itemName)
 
-    def _generateXfromTable(self, data, i):
-        if self.__version[0:4] == '0-0-':
-            return self._generateX_V0(data,i)
-        if self.__version[0:4] == '0-1-':
-            return self._generateX_V1(data,i)
-            
-    def _generateX_V0(self, data,i): 
-        ocorrX = data.loc[i,self.OCORRENCIA1]
-        if data.loc[i,self.OCORRENCIA1] == self.REPOSICAO:
-            if data.loc[i,self.OCORRENCIA2] == self.COM_ESTOQUE:
-                ocorrX = self.RUPTURA_GONDOLA
-            else:
-                ocorrX = self.RUPTURA_LOJA
-        if ocorrX == self.PRESENCA:
-            return [1,0,0]
-        elif ocorrX == self.RUPTURA_GONDOLA:
-            return [0,1,0]
-        elif ocorrX == self.RUPTURA_LOJA:
-            return [0,0,1]
-        
-    def _generateX_V1(self, data,i):
-        x = []
-        ocorr = data.loc[i,self.OCORRENCIA1]
-        if ocorr == self.RUPTURA_GONDOLA or ocorr == self.RUPTURA_GONDOLA:
-            xOcorr = 0
-        elif ocorr == self.REPOSICAO:
-            xOcorr = 0.33
-        else:
-            xOcorr = 1
-        if data.loc[i,self.OCORRENCIA2] == self.COM_ESTOQUE:
-            xEstoque = 1
-        else:
-            xEstoque = 0
-        return [xOcorr, xEstoque]
+    def _extractAllRelevantInformation(self, data, i):
+        x = {}
+        x[self.OCORRENCIA1] = data.loc[i,self.OCORRENCIA1]
+        x[self.OCORRENCIA2] = data.loc[i,self.OCORRENCIA2]
+        x[self.DIA_MES_ANO] = data.loc[i,self.DIA_MES_ANO]
+        return x
 
     def _defineSample(self, data, itemName):
         allClients = list(collections.Counter(data.loc[:,self.NOME_CLIENTE]))
@@ -99,6 +71,7 @@ class TableToDictionary:
         self.COM_ESTOQUE = 'Unidades Estocadas Armazenadas'
         self.PRODUTO = 'Produto'
         self.DIA_SEMANA = 'DiaDaSemana'
+        self.DIA_MES_ANO = 'Data Hora de encerramento da OS'
 
     
     

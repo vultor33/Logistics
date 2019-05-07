@@ -34,6 +34,11 @@ class CreateBatch:
         LastX = np.array(LastX)
         return[X, Y, Ytest, LastX]
 
+    def getUnknwows(self):
+        """ Return one hot encoder that represents Unknows:  [unkX, unkY] """
+        return self.__encoder.getUnknwows()
+
+
 ###################################################################################################################    
 # FILE HANDLING
 ###################################################################################################################    
