@@ -1,8 +1,6 @@
 import collections
 import json
 import numpy as np
-import re
-import datetime
 
 from ruptura.TableToDictionary import TableToDictionary
 from ruptura.Encoder import Encoder
@@ -15,9 +13,8 @@ class CreateBatch:
         self.titles = []
         self.PRODUTO = 'Produto'
 
-    def batch(self, fileName, sampleShape = (60,4)):
+    def batch(self, fileName):
         amostras = self.loadBatch(fileName)
-        print('WARNING - need error handling on samples')
         X = []
         Y = []
         Ytest = []
@@ -27,8 +24,6 @@ class CreateBatch:
             y = np.array(amostras[key]['y'])
             yt = np.array(amostras[key]['ytest'])
             LastX.append(amostras[key]['lastX'])
-            if x.shape != sampleShape:
-                continue
             X.append(x)
             Y.append(y)
             Ytest.append(yt)
