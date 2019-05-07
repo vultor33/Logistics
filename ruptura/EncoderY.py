@@ -30,12 +30,14 @@ class EncoderY:
         
     def _generateYv01(self, xDict):
         ocorr1 = xDict[self.OCORRENCIA1]
-        if ocorr1 == self.RUPTURA_GONDOLA or ocorr1 == self.RUPTURA_GONDOLA:
+        if ocorr1 == self.RUPTURA_GONDOLA or ocorr1 == self.RUPTURA_LOJA:
             yOcorr = 0
         elif ocorr1 == self.REPOSICAO:
             yOcorr = 0.33
-        else:
+        elif ocorr1 == self.PRESENCA:
             yOcorr = 1
+        else:
+            raise Exception('ocorrencia nao definida:  ' + str(ocorr1))
         return [yOcorr, 0]        
     
 ################################################################################################    
@@ -64,6 +66,8 @@ class EncoderY:
     def _defineConstantsYv01(self):
         self.OCORRENCIA1 = 'Ocorr ncia'
         self.RUPTURA_GONDOLA = 'Ruptura em G ndola'
+        self.RUPTURA_LOJA = 'Ruptura em Loja'
         self.REPOSICAO = 'Reposi o'
+        self.PRESENCA = 'Presen a'
         self.COM_ESTOQUE = 'Unidades Estocadas Armazenadas'
         

@@ -31,17 +31,21 @@ class EncoderX:
     def _generateXv01(self, xDict):
         ocorr1 = xDict[self.OCORRENCIA1]
         ocorr2 = xDict[self.OCORRENCIA2]
-        if ocorr1 == self.RUPTURA_GONDOLA or ocorr1 == self.RUPTURA_GONDOLA:
+        if ocorr1 == self.RUPTURA_GONDOLA or ocorr1 == self.RUPTURA_LOJA:
             xOcorr = 0
         elif ocorr1 == self.REPOSICAO:
             xOcorr = 0.33
-        else:
+        elif ocorr1 == self.PRESENCA:
             xOcorr = 1
+        else:
+            raise Exception('ocorrencia nao definida:  ' + str(ocorr1))
         if ocorr2 == self.COM_ESTOQUE:
             xEstoque = 1
-        else:
+        elif ocorr2 == self.SEM_ESTOQUE:
             xEstoque = 0
-        return [xOcorr, xEstoque, 0]        
+        else:
+            raise Exception('ocorrencia 2 nao definida:  ' + str(ocorr1))
+        return [xOcorr, xEstoque, 0]    
     
 ################################################################################################    
 # GENERATE UNKNOW
@@ -70,8 +74,11 @@ class EncoderX:
         self.OCORRENCIA1 = 'Ocorr ncia'
         self.OCORRENCIA2 = 'Ocorr ncia2'
         self.RUPTURA_GONDOLA = 'Ruptura em G ndola'
+        self.RUPTURA_LOJA = 'Ruptura em Loja'
+        self.PRESENCA = 'Presen a'
         self.REPOSICAO = 'Reposi o'
         self.COM_ESTOQUE = 'Unidades Estocadas Armazenadas'
+        self.SEM_ESTOQUE = 'Sem Unidades Estocadas Armazenadas'
         
         
         

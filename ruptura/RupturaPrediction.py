@@ -27,7 +27,7 @@ class RupturaPrediction:
         return self.__walkCounter
         
     def getLastPointsOfX(self):
-        lastPoints = rupPred.getStepPoints(self.__X,-1)
+        lastPoints = self.getStepPoints(self.__X,-1)
         return lastPoints
         
     def getStepPoints(self, pointsBatch, step_i, changeToArgmax = False):
@@ -92,18 +92,11 @@ class RupturaPrediction:
             points.append(self.DESCONHECIDO)
         return np.array(points) 
 
-    def calculateScoreOfBatch(self, pointsBatch, time_step = -1):
-        points = self.getStepPoints(pointsBatch, time_step)
-        score = []
-        for point in points:
-            if point[0] == 1:
-                score.append(-1)
-            else:
-                score.append(point[1])
-        return score
-
+##############################################################################################
+# VALIDATION
+##############################################################################################
+ 
     def validate(self,Ytest, model):
-        yRealValues = []
         for i in range(self.VALIDATION_DAYS):
             self.step(model)
             self.__realValues.append(self.calculateScoreOfBatch(Ytest,i))
@@ -111,25 +104,28 @@ class RupturaPrediction:
         self.__score = np.array(self.__score)
     
     def calculateDataScore(self):
+        print('essa funcao depende muito do formato do Y')
         dataScore = []
         for i_batch in range(self.__realValues.shape[1]):
             predictions = []
-            isRuptura = False
             for day in range(self.__realValues.shape[0]):
                 predictions.append(self.__score[day][i_batch])
-                if self.__realValues[day][i_batch] == 1:
+                if self.__realValues[day][i_batch] != -1:
                     rupScore = int(100*np.max(predictions))
-                    dataScore.append((rupScore,1))
-                    isRuptura = True
-                    break
-                elif self.__realValues[day][i_batch] == -1:  
-                    rupScore = int(100*np.max(predictions))
-                    dataScore.append((rupScore,0))
-                    isRuptura = True
+                    dataScore.append((rupScore,self.__realValues[day][i_batch]))
                     break
         dataScore = pd.DataFrame(data=dataScore,columns=['score','Inadimplente'])
         return dataScore
     
+    def calculateScoreOfBatch(self, pointsBatch, time_step = -1):
+        points = self.getStepPoints(pointsBatch, time_step)
+        score = []
+        for point in points:
+            if point[1] == 1:
+                score.append(-1)
+            else:
+                score.append(point[0])
+        return score
 
 
 
