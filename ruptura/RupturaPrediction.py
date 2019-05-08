@@ -1,7 +1,4 @@
-import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
-from core.DataExploration import DataExploration
 
 # The neural network receives 60 and returns the next point of each of received point.
 # X = [dia 1 - presenca, dia 2 - desconhecido, dia 3 - ruptura]
@@ -54,12 +51,14 @@ class RupturaPrediction:
     def walkNSteps(self, model, nSteps):
         for i in range(nSteps):
             self.step(model)
+        self.reshapeAnnPred()
         return self.getAnnPred()
     
     def step(self, model):
         self._advanceX()
         annPrediction = model.predict(self.__X, batch_size=self.__X.shape[0], verbose=0)
-        self.__annPred.append(self.getLastDay(annPrediction)) # cada passo eu quero a previsao do proximo (ultimo) ponto
+        lastDayPredicted = self.getLastDay(annPrediction)
+        self.__annPred.append(lastDayPredicted) # cada passo eu quero a previsao do proximo (ultimo) ponto
 
     def _advanceX(self, points = []):
         if len(points) == 0:
@@ -88,6 +87,16 @@ class RupturaPrediction:
     def getAnnPred(self):
         return np.array(self.__annPred)
 
+    def reshapeAnnPred(self):
+        self.__annPred = np.array(self.__annPred)
+        predNew = []
+        for i_batch in range(self.__annPred.shape[1]):
+            daysPred = []
+            for day in range(self.__annPred.shape[0]):
+                daysPred.append(self.__annPred[day][i_batch])
+            predNew.append(daysPred)
+        self.__annPred = np.array(predNew)
+
     def getX(self):
         return self.__X
     
@@ -103,72 +112,4 @@ class RupturaPrediction:
     
     
     
-##############################################################################################
-# SCORE
-##############################################################################################
-
-    def plotScore(self, dataScore):
-        dataScore.loc[:,'Inadimplente'] = [str(x) for x in dataScore.loc[:,'Inadimplente'].values]
-        de = DataExploration(dataScore)
-        de.setNpoints(self.PLOT_POINTS)
-        de.graphicInadimplenciaXContinuum(dataScore, 'score')
-
-    def plotAllBatches(self):
-        for i_batch in range(self.__score.shape[1]):
-            self.plotSampleOfBatch(i_batch)
     
-    def plotSampleOfBatch(self, i_batch): #need to validate first
-        if self.__walkCounter == 0:
-            raise Exception('Cant plot sample, need to validate first')
-        pred = self.__score[:,i_batch]
-        real = self.__realValues[:,i_batch]
-        x = range(len(pred))
-        fig = plt.figure()
-        name = 'amostra-' + str(i_batch) + '-previsto-vs-real'
-        plt.title(name)
-        plt.ylim((-0.1, 1.1))  
-        plt.plot(x, pred, 'r', label='PREVISTO, x') # x
-        plt.plot(x, real, 'b', label='REAL, y') # y
-        plt.legend(loc='best')
-        fig.savefig(name + '.png',dpi=150)
-        plt.close(fig)
-     
-    
-    
-##############################################################################################
-# VALIDATION
-##############################################################################################
- 
-    def validate(self,Ytest, model):
-        for i in range(self.VALIDATION_DAYS):
-            self.step(model)
-            self.__realValues.append(self.calculateScoreOfBatch(Ytest,i))
-        self.__realValues = np.array(self.__realValues)
-        self.__score = np.array(self.__score)
-    
-    def calculateDataScore(self):
-        print('essa funcao depende muito do formato do Y')
-        dataScore = []
-        for i_batch in range(self.__realValues.shape[1]):
-            predictions = []
-            for day in range(self.__realValues.shape[0]):
-                predictions.append(self.__score[day][i_batch])
-                if self.__realValues[day][i_batch] != -1:
-                    rupScore = int(100*np.max(predictions))
-                    dataScore.append((rupScore,self.__realValues[day][i_batch]))
-                    break
-        dataScore = pd.DataFrame(data=dataScore,columns=['score','Inadimplente'])
-        return dataScore
-    
-    def calculateScoreOfBatch(self, pointsBatch, time_step = -1):
-        points = self.getStepPoints(pointsBatch, time_step)
-        score = []
-        for point in points:
-            if point[1] == 1:
-                score.append(-1)
-            else:
-                score.append(point[0])
-        return score
-
-
-

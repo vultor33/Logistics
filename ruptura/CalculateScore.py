@@ -12,10 +12,10 @@ class CalculateScore:
         
     def _calculateScorev01(self, Y):
         score = []
-        for i_batch in range(Y.shape[1]):
+        for i_batch in range(Y.shape[0]):
             clientScore = []
-            for day in range(Y.shape[0]):
-                clientScore.append(int(100*Y[day][i_batch][0]))
+            for day in range(Y.shape[1]):
+                clientScore.append(int(100*Y[i_batch][day][0]))
             score.append(np.array(clientScore))
         return np.array(score)        
         
