@@ -3,43 +3,109 @@ import numpy as np
 import pandas as pd
 from core.DataExploration import DataExploration
 
+# The neural network receives 60 and returns the next point of each of received point.
+# X = [dia 1 - presenca, dia 2 - desconhecido, dia 3 - ruptura]
+# Y = [dia 2 - desconhecido, dia 3 - ruputura, dia 4 - deconhecido] (so tenho interesse nesse dia 4)
+
 class RupturaPrediction:
-    def __init__(self, X):
-        self.DESCONHECIDO = [0,0,0,1]
+    def __init__(self, X, xUnknow):
+        self.UNKNOW = xUnknow
         self.VALIDATION_DAYS = 7
         self.PLOT_POINTS = 5
-        self.__Xstart = X.copy()
-        self.__X = self.__Xstart.copy()
-        self.__score = []
-        self.__realValues = []
-        self.__walkCounter = 0
-    
-    def getScore(self):
-        return self.__score
+        self.walkCounter = 0
+        self.__X = X.copy()
+        self.__annPred = []
 
-    def getRealValues(self):
-        return self.__realValues
+        
+##############################################################################################
+# BATCH CUTS
+##############################################################################################
+        
+    def returnSelectedDayBatch(self, pointsBatch, selectedDay):
+        """
+        Receives a pointsBatch in following format: 
+        (N samples of client-product , days around 60, one hot encoder representing event)
+        Returns in following format of the selectedDay:
+        (N samples of client-product , one hot encoder representing event)
+        """
+        points = []
+        for batch in pointsBatch:
+            batchStep = batch[selectedDay]
+            points.append(batchStep)
+        return np.array(points)
+
+    def getLastDay(self, pointsBatch):
+        return self.returnSelectedDayBatch(pointsBatch, -1)
+
+    def applyArgMaxToSelectedDayBatch(self, dayBatch):
+        eventSize = dayBatch.shape[1]
+        eventsArgMax = []
+        for event in dayBatch:
+            argM = np.argmax(event)
+            event = np.zeros(eventSize)
+            event[argM] = 1
+            eventsArgMax.append(event)
+        return np.array(eventsArgMax)
+
+##############################################################################################
+# WALK IN THE PREDICTIONS
+##############################################################################################
+    
+    def walkNSteps(self, model, nSteps):
+        for i in range(nSteps):
+            self.step(model)
+        return self.getAnnPred()
+    
+    def step(self, model):
+        self._advanceX()
+        annPrediction = model.predict(self.__X, batch_size=self.__X.shape[0], verbose=0)
+        self.__annPred.append(self.getLastDay(annPrediction)) # cada passo eu quero a previsao do proximo (ultimo) ponto
+
+    def _advanceX(self, points = []):
+        if len(points) == 0:
+            points = self._createUnknowPoints()
+        Xnext = []
+        for xBatch, point in zip(self.__X, points):
+            xBatch = np.array(xBatch[1:])                   #throw first value
+            Xnext.append(np.append(xBatch,[point],axis=0))  #add point
+        self.walkCounter += 1
+        self.__X = np.array(Xnext)
+
+    def _createUnknowPoints(self):
+        points = []
+        for i in range(self.__X.shape[0]):
+            points.append(self.UNKNOW)
+        return np.array(points) 
+        
+    def addLastX(self, lastX): # First Y is included in training batch, so we cant use it for validation
+        self._advanceX(lastX)
+
+
+##############################################################################################
+# GETTERS
+##############################################################################################
+
+    def getAnnPred(self):
+        return np.array(self.__annPred)
 
     def getX(self):
         return self.__X
-        
-    def getWalkSteps(self):
-        return self.__walkCounter
-        
-    def getLastPointsOfX(self):
-        lastPoints = self.getStepPoints(self.__X,-1)
-        return lastPoints
-        
-    def getStepPoints(self, pointsBatch, step_i, changeToArgmax = False):
-        points = []
-        for batch in pointsBatch:
-            batchStep = batch[step_i]
-            if changeToArgmax:
-                value = np.argmax(batchStep)
-                batchStep = np.zeros_like(batchStep)
-                batchStep[value] = 1
-            points.append(batchStep)
-        return np.array(points)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+##############################################################################################
+# SCORE
+##############################################################################################
 
     def plotScore(self, dataScore):
         dataScore.loc[:,'Inadimplente'] = [str(x) for x in dataScore.loc[:,'Inadimplente'].values]
@@ -66,32 +132,9 @@ class RupturaPrediction:
         plt.legend(loc='best')
         fig.savefig(name + '.png',dpi=150)
         plt.close(fig)
+     
     
-    def step(self, model):
-        self.walk()
-        annPrediction = model.predict(self.__X, batch_size=self.__X.shape[0], verbose=0)
-        scoreBatch = self.calculateScoreOfBatch(annPrediction)
-        self.__score.append(scoreBatch)
-
-    def addLastX(self, lastX): # First Y is included in training batch, so we cant use it for validation
-        self.walk(lastX)
-
-    def walk(self, points = []):
-        if len(points) == 0:
-            points = self._createDesconhecidoPoints()
-        Xnext = []
-        for xBatch, point in zip(self.__X, points):
-            xBatch = np.array(xBatch[1:])                   #throw first value
-            Xnext.append(np.append(xBatch,[point],axis=0))  #add point
-        self.__walkCounter += 1
-        self.__X = np.array(Xnext)
-        
-    def _createDesconhecidoPoints(self):
-        points = []
-        for i in range(self.__X.shape[0]):
-            points.append(self.DESCONHECIDO)
-        return np.array(points) 
-
+    
 ##############################################################################################
 # VALIDATION
 ##############################################################################################
