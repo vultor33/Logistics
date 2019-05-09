@@ -22,7 +22,7 @@ class TableToDictionary:
     def _createSampleItem(self, data, itemName, sampleItem):
         for i in data.index:
             key = self._getKey(data, i, itemName)
-            dateI = data.loc[i,self.DATA_OCORRENCIA]
+            dateI = data.loc[i,self.DIA_MES_ANO].split(' ')[0]
             xValue = self._extractAllRelevantInformation(data, i)
             self._addToSample(sampleItem, key, dateI, xValue)
         return sampleItem
