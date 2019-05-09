@@ -38,7 +38,6 @@ class CreateBatch:
         """ Return one hot encoder that represents Unknows:  [unkX, unkY] """
         return self.__encoder.getUnknwows()
 
-
 ###################################################################################################################    
 # FILE HANDLING
 ###################################################################################################################    
@@ -68,9 +67,10 @@ class CreateBatch:
         itemIndexes = self.searchFlag(itemName, data, exactMatch = True)[itemName]
         data = data.loc[itemIndexes,:].copy()
         data = data.reset_index(drop=True)
-        amostrasItem = self.__tableToDictionary.convertToDict(data, itemName)
-        amostras = self.__encoder.applyOneHotEncoder(amostrasItem, referenceDate)
-        return amostras
+        return self.__tableToDictionary.convertToDict(data, itemName)
+        #amostrasItem = self.__tableToDictionary.convertToDict(data, itemName)
+        #amostras = self.__encoder.applyOneHotEncoder(amostrasItem, referenceDate)
+        #return amostras
 
 ###################################################################################################################    
 # SEARCH ITEM IN TABLES

@@ -74,3 +74,6 @@ class Encoder:
         ano = int(momento[2].split(' ')[0])
         return (datetime.datetime(ano, mes, dia) - self.__now).days    
 
+
+
+

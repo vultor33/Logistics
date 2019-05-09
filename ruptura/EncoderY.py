@@ -3,11 +3,13 @@
 class EncoderY:
     """ Transform data into one hot encoder format for Y variable """
     def __init__(self,version):
+        self.REPOSICAO_VALUE = 0.33
         self.__version = version
         self.__UNKNWOW = self._generateUnknow()
         self._defineConstants()
         
     def calculateYEvent(self, xDate, sample):
+        print('DEPRECATED - should be removed in future version')
         if xDate in sample['data']:
             dateIndex = sample['data'].index(xDate)
             event = self._generateY(sample['x'][dateIndex])
@@ -33,7 +35,7 @@ class EncoderY:
         if ocorr1 == self.RUPTURA_GONDOLA or ocorr1 == self.RUPTURA_LOJA:
             yOcorr = 0
         elif ocorr1 == self.REPOSICAO:
-            yOcorr = 0.33
+            yOcorr = self.REPOSICAO_VALUE
         elif ocorr1 == self.PRESENCA:
             yOcorr = 1
         else:

@@ -3,17 +3,22 @@
 class EncoderX:
     """ Transform data into one hot encoder format for X variable """
     def __init__(self,version):
+        self.REPOSICAO_VALUE = 0.33
         self.__version = version
         self.__UNKNWOW = self._generateUnknow()
         self._defineConstants()
         
     def calculateXEvent(self, xDate, sample):
+        print('DEPRECATED - should be removed in future version')
         if xDate in sample['data']:
             dateIndex = sample['data'].index(xDate)
             event = self._generateX(sample['x'][dateIndex])
         else:
             event = self.__UNKNWOW
         return event        
+
+    def oneHot(self, x):
+        return self._generateX(x)
 
     def getXUnknwow(self):
         return self.__UNKNWOW
@@ -34,7 +39,7 @@ class EncoderX:
         if ocorr1 == self.RUPTURA_GONDOLA or ocorr1 == self.RUPTURA_LOJA:
             xOcorr = 0
         elif ocorr1 == self.REPOSICAO:
-            xOcorr = 0.33
+            xOcorr = self.REPOSICAO_VALUE
         elif ocorr1 == self.PRESENCA:
             xOcorr = 1
         else:
