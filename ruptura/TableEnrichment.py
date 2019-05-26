@@ -1,3 +1,16 @@
+# visits
+# -- store
+#    -- visit date1
+#        -- product
+#           -- x (characteristics)
+#           -- status (present, absent)
+#    -- visit date2
+#       ...
+#    -- info
+#       -- allProducts
+#          -- all products that appear on that store
+
+
 class TableEnrichment:
     def __init__(self, version):
         self.__version = version
