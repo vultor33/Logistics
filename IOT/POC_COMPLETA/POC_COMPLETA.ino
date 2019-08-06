@@ -118,7 +118,7 @@ String generate_authorization(String authorization_response){
   
 }
 
-String generate_json(int measure){
+String generate_json(int measure){  // CUIDADO COM ISSO AQUI, E BEM ESPECIFICO
     StaticJsonDocument<800> doc;
     StaticJsonDocument<200> doc_nested;
     doc["Limit"] = "2019-09-05T17:00:00";
