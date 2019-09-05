@@ -4,13 +4,13 @@ import numpy as np
 def converte_latin_para_float(valor):
     ''' Recebe um numero no formato latino e o converte em um
         valor numerico '''
-    if _is_nan(valor):
+    if e_nulo(valor):
         return np.nan
     valor = str(valor).replace('.','')
     valor = str(valor).replace(',','.')
     return float(valor)
 
-def _is_nan(valor):
+def e_nulo(valor):
     valor_string = str(valor).lower()
     if valor_string == 'nan' or valor_string == 'none' or valor_string == 'nat':
         return True
