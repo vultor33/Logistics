@@ -1,0 +1,55 @@
+nome;tabela;tipo;adicional;observacoes
+associados_distintos_30_dias;originacao;int;;número de consultas no birô feitas por fontes diferentes nos últimos 30 dias.
+atraso_medio;originacao;real;;atraso médio do cliente no instante em que a proposta foi feita
+categoria_profissional;originacao;text;;Categoria profissional do cliente, exemplos: autonomo, func publico e etc.
+cep;originacao;bigint;;cep do cliente
+cliente_novo;originacao;int;;1 se o cliente for novo e 0 do contrario
+codigo_lojista;originacao;text;;Codigo do lojista, exemplo: eletrossom, dular e etc.
+codigo_lojista_filial;originacao;text;;Codigo da filial do lojista. Especifica qual filial o emprestimo aconteceu
+codigo_proposta;originacao;bigint;not null;pequenas mudancas nas propostas não alteram o codigo
+cpf;originacao;bigint;not null;cpf do cliente no formato numerico
+datahora_pedido;originacao;timestamp;not null;data e hora em que a proposta foi realizada
+genero;originacao;text;;M para masculino, F para feminino e null se for desconhecido
+id;originacao;bigint;primary key not null;O codigo proposta não foi escolhido por ter varias propostas com o mesmo codigo
+idade;originacao;int;;idade do cliente em anos
+quantidade_consultas;originacao;int;;quantidade de consultas feitas no birô
+quantidade_parcelas_plano;originacao;int;;quantidade de parcelas combinadas na compra
+renda_cliente;originacao;real;;renda do cliente no momento da proposta
+renda_presumida_unitfour;originacao;real;;"renda do cliente segundo uma pesquisa feita no ""birô"" unitfour"
+score;originacao;int;;valor do score
+tempo_emprego;originacao;int;;Tempo no mesmo emprego em meses
+tempo_moradia;originacao;int;;Tempo que mora na mesma casa em meses
+uf;originacao;text;;estado onde a proposta foi feita
+ultimo_pedido;originacao;int;;admite apenas os valores 0 e 1. Se existem propostas com o mesmo codigo e mais recentes, então o codigo e 0, se for a ultima proposta o codigo e 1.
+valor_parcela;originacao;real;;valor da parcela da compra
+cpf;acionamentos;bigint;not null;cpf do cliente no formato numerico
+datahora;acionamentos;timestamp;not null;datahora em que o acionamento aconteceu
+dias_atraso;acionamentos;int;;Dias em atraso no momento do acionamento
+id;acionamentos;bigint;primary key not null;id do acionamento
+motivo;acionamentos;text;;explicacao dos eventos que aconteceram no acionamento, e.g. envio de sms
+observacoes;acionamentos;text;;observoes não estruturadas sobre o acionamento
+responsavel_id;acionamentos;int;not null;codigo que aponta para o responsavel pelo acionamento
+codigo_contrato;pdd;bigint;not null;Codigo do contrato
+codigo_produto;pdd;int;;Codigo único que define o produto
+cpf;pdd;bigint;not null;cpf do cliente no formato numerico
+data_originacao;pdd;timestamp;;data de originacao do contrato
+data_proxima_parcela;pdd;timestamp;;data da parcela seguinte no instante em que o relatorio foi gerado
+data_referencia;pdd;timestamp;not null;data de referencia do relatório de pdd
+data_renegociacao;pdd;timestamp;;data em que houve alguma renegociacao
+data_vencimento;pdd;timestamp;;data de vencimento do contrato
+dias_atraso;pdd;int;;dias em atraso do contrato no momento em que o relatorio foi gerado
+id;pdd;bigint;primary key not null;identificador da tabela
+quantidade_parcelas_abertas;pdd;int;;quantidade de parcelas que ainda precisam ser pagas. Não confundir com parcelas em atraso.
+rating_contabil_fim;pdd;text;;rating contabil no instante em que o relatorio foi gerado
+renda_cliente;pdd;real;;renda do cliente
+valor_financiado;pdd;real;;valor cedido ao cliente (valor compra)
+valor_pdd;pdd;real;;valor pdd contabil
+valor_proxima_parcela;pdd;real;;valor da proxima parcela
+valor_saldo;pdd;real;;saldo contabil
+id;responsavel;int;primary key not null;idetificador
+funcao;responsavel;text;not null;funcao que exerceu, esta entre: semear, SAC, assessoria
+empresa;responsavel;text;not null;empresa do responsavel, e.g. mar azul, semear, cobrarr e etc.
+nome;responsavel;text;;nome do responsavel
+codigo_contrato;formalizacao;bigint;primary key not null;Codigo do contrato
+codigo_proposta;formalizacao;bigint;not null;Codigo da proposta de originacao correspondente
+codigo_produto;formalizacao;int;;Codigo único que define o produto
