@@ -1,0 +1,38 @@
+
+
+
+Kafka so move bytes para la e pra ca.
+Voce precisa garantir que o Schema esta
+correto na entrada e na saida.
+Se mudar o schema tem que criar um novo topico.
+
+Observar ordem, unique ID e tal, porque se tiver multiplos
+producers voce pode nao saber ordenar os records.
+
+
+
+
+
+
+
+
+
+
+
+INSTALACAO
+
+
+Tem que configurar o JAVA direito e depois setar os caminhos do zookeper
+
+https://medium.com/@shaaslam/installing-apache-zookeeper-on-windows-45eda303e835
+
+Para rodar o kafka tem que iniciar o zookeeper primeiro:
+Abra o cmd e digite:
+zkServer  [ENTER]
+
+
+Em seguida, abre outro terminal e rode o kafka:
+Va a pasta: bin\windows  (D:\kafka_2.11-2.3.0\bin\windows)
+Rode:
+kafka-server-start.bat server.properties           # na instalacao original esse server.properties esta no \config, tem que mover ele para ca.
+
